@@ -9,8 +9,3 @@ print(w3.isConnected())
 
 latest_block = w3.eth.get_block('latest')
 print(latest_block)
-
-print("\n")
-
-address = input("Enter Address: ")
-tx_count = Web3.eth.getTransactionCount(address)
