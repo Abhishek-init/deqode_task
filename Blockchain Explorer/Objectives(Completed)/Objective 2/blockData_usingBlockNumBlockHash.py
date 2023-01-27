@@ -6,7 +6,8 @@ from web3.middleware import geth_poa_middleware
 
 #Getting block data using block number & block Hash
 def get_block_data_num(block_number):
-    w3 = Web3(Web3.HTTPProvider('https://celo-mainnet.infura.io/v3/c0675c5a775e421db5430b57358c8b52'))
+    # w3 = Web3(Web3.HTTPProvider('https://celo-mainnet.infura.io/v3/c0675c5a775e421db5430b57358c8b52'))
+    w3 = Web3(Web3/HTTPProvider('httpd://127.0.0.1:8545)
     w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
     Block_data_using_num = w3.eth.get_block(block_number)  #Using Block Number
