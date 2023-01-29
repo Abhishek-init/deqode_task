@@ -1,11 +1,39 @@
 import React from 'react';
-import Style from './App.css';
+import './App.css';
 
 function App() {
 
   const [Hashvalue, setHashValue] = React.useState('');
   const [fetchData, setFetchedData] = React.useState('');
+  const [connectWallet, setConnectWallet] = React.useState('');
+  const [walletId, setWalletId] = React.useState(connectWallet)
   const [check, setCheck] = React.useState(0);
+
+  React.useEffect(() => {
+
+    if (typeof window.ethereum === 'undefined') {
+      setConnectWallet('MetaMask isnt installed, please install it')
+      return false
+    }
+
+  }, [connectWallet])
+
+
+  async function connectWalletwithMetaMask() {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+    .catch((e) => {
+    console.error(e.message)
+    return
+    })
+
+    if (!accounts) { return }
+
+    window.userWalletAddress = accounts[0]
+    setWalletId(window.userWalletAddress)
+
+    return;
+
+  }
 
   const getData = async (e) => {
 
@@ -43,9 +71,21 @@ function App() {
 
         });
       }
-      else{
+      else if(check === 2){
 
         data = await fetch(`http://localhost:5000/api/block/transaction_hash/${Hashvalue}`, {
+          method: 'GET',
+          // mode:'cors',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+
+        });
+      }
+      else{
+
+        data = await fetch(`http://localhost:5000/api/balance/${Hashvalue}`, {
           method: 'GET',
           // mode:'cors',
           headers: {
@@ -84,21 +124,6 @@ function App() {
   return (
     <>
       <div className={`flex flex-wrap main`}>
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <form onSubmit={getData}>
-
-          <input type="text" value={Hashvalue} onChange={e => setHashValue(e.target.value)} />
-          
-          <input type="submit" value="SUBMIT" />
-
-
-        </form>
-        <span>{fetchData}</span>
-      </header> */}
 
       <div className='flex flex-column flex-justify-center flex-align-center'>
 
@@ -111,20 +136,24 @@ function App() {
         </div>
         
         <button className='options' onClick={() => setCheck(2)}>Transaction Hash</button>
+        <button className='options' onClick={() => setCheck(3)}>Metamask Address</button>
 
         <form onSubmit={getData}>
 
           <div className="flex flex-column form_div">
 
-            <input className='text_field' type="text" value={Hashvalue} onChange={e => setHashValue(e.target.value)} placeholder={check === 0 ? "Enter Block Number" : check === 1 ? "Enter Block Hash" : "Enter Transction Hash"} />
+            <input className='text_field' type="text" value={Hashvalue} onChange={e => setHashValue(e.target.value)} placeholder={check === 0 ? "Enter Block Number" : check === 1 ? "Enter Block Hash" : check === 2 ? "Enter Transction Hash" : "Enter metamask address"} />
             <input className='btn' type="submit" value="SUBMIT" />
 
           </div>
 
         </form>
 
-        <span style={{fontWeight: 500}}>{check === 0 ? 'You are fetching Block Data using Block Number' : check === 1 ? 'You are fetching Block Data using Block Hash' : 'You are fetching Transaction Data using Transaction Hash'}</span>
+        <span style={{fontWeight: 500}}>{check === 0 ? 'You are fetching Block Data using Block Number' : check === 1 ? 'You are fetching Block Data using Block Hash' : check === 2 ? 'You are fetching Transaction Data using Transaction Hash' : 'You are fetching Wallet Balance using metamask address'}</span>
 
+        <br />
+        <button className='options' style={{background: 'orange'}} onClick={() => connectWalletwithMetaMask()}> Connect Metamask</button>
+        {walletId!=='' && <span>Wallet Address: {walletId}</span>}
         <hr />
         <strong><i><span style={{margin: '50px 0 10px 0'}}>CREDIT: ADITYA CHOUHAN</span></i></strong>
 
